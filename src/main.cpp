@@ -6,6 +6,8 @@
 // using MCU with no operating system should give exact values without significant delays caused by hardware or OS
 
 #include <Arduino.h>
+// #include <vector>
+#include <statistics.hpp>
 
 // define harware wiring and logic
 #define LED_PIN 8
@@ -14,6 +16,9 @@
 #define LED_OFF 1
 #define BUTTON_ON 0
 #define BUTTON_OFF 1
+
+#define MIN_RESONABLE_TIME 120 //minimum resonable reaction time, faster means cheeting, results are reseted
+#define MAX_RESONABLE_TIME 500 //too long reaction time, means sombody is distracted or ill
 
 // standard Arduino setup, which runs only once after MCU starts or resets
 void setup()
@@ -33,8 +38,13 @@ void setup()
 bool counting = false;       // says if time counint is started or not
 unsigned long startTime = 0; // moment in time, that counting started (in ms since device has stared)
 
+// container for the data to calculate statistical information
+libstatistics::accumulator acc;
+
 void loop()
 {
+  unsigned long currentResult = 0;
+
   if (!counting)
   {
     // set led OFF,
@@ -55,7 +65,27 @@ void loop()
     if (digitalRead(BUTTON_PIN) == BUTTON_ON)
     {
       // display reaction time
-      Serial.printf("Reaction time in miliseconds %d \n", millis() - startTime);
+      currentResult = millis() - startTime;
+      if ((currentResult < MAX_RESONABLE_TIME) && (currentResult > MIN_RESONABLE_TIME))
+      {
+        Serial.printf("Reaction time in miliseconds %d | ", currentResult);
+
+        // add data to the container of statistical data
+        acc.add((double)currentResult);
+        Serial.printf("Mean value %3.0f\n", acc.getMean());
+      }
+      else
+      {
+        Serial.printf("Reaction time in miliseconds %d | too long or too quick, NOT COUNTED \n", currentResult);
+      };
+      
+      if (currentResult < MIN_RESONABLE_TIME)
+      {
+        // assume user hold key, meanning wants to reset the count
+        Serial.printf("RESET of statistics\n");
+        acc.reset();
+      }
+
       // start again
       counting = false;
     }
