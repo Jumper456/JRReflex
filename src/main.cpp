@@ -31,14 +31,12 @@ void setup()
   pinMode(LED_PIN, OUTPUT);
   pinMode(BUTTON_PIN, INPUT_PULLUP);
 
+  delay(3000);
   // say hallo
-  Serial.println("==================================================================================");
   Serial.println("JRReflex copyleft 2024 J.K.Wachowicz (github: jumper456)");
-  Serial.println("==================================================================================");
   Serial.println("READY, just press Boot button after blue LED is up, as quickly as you can.");
   Serial.printf("After %d tries statistics are presented.\n", SERIES_SIZE);
   Serial.println("After holding the button for few seconds session is reset");
-  Serial.println("==================================================================================");
   Serial.println();
 }
 
@@ -90,7 +88,7 @@ void loop()
       if (currentResult < MIN_RESONABLE_TIME)
       {
         // assume user hold key, meanning wants to reset the count
-        Serial.printf("Key hold for few seconds: RESET of statistics\n");
+        Serial.printf("Key held for few seconds: RESET of statistics\n");
         acc.reset();
         delay(3000);
       }
