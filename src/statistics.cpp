@@ -1,7 +1,9 @@
 //this code has been downloaded from https://github.com/harumo11/libstatistics 
 //credits to the author (harumo11)
+//extended by J.K.Wachowicz
 
 #include <statistics.hpp>
+
 
 /**
  * @brief A constructor 1 of 2. Set data of std::vector<double>.
@@ -53,6 +55,17 @@ libstatistics::accumulator::~accumulator()
 {
 
 }
+
+/**
+ * @brief Get size of the data (number of items).
+ *
+ * @return size of the data (number of items).
+ */
+unsigned long libstatistics::accumulator::getSize()
+{
+	return (unsigned long)this->data.size();
+}
+
 
 /**
  * @brief Get sum of the data.

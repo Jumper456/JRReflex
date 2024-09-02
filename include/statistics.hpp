@@ -17,6 +17,7 @@ namespace libstatistics {
 			accumulator(std::vector<double> &vector_data);
 			~accumulator();
 
+			unsigned long getSize();
 			double getSum();
 			double getMean();
 			double getVariance();

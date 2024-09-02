@@ -17,8 +17,9 @@
 #define BUTTON_ON 0
 #define BUTTON_OFF 1
 
-#define MIN_RESONABLE_TIME 120 //minimum resonable reaction time, faster means cheeting, results are reseted
-#define MAX_RESONABLE_TIME 500 //too long reaction time, means sombody is distracted or ill
+#define MIN_RESONABLE_TIME 120 // minimum resonable reaction time, faster means cheeting, results are reseted
+#define MAX_RESONABLE_TIME 500 // too long reaction time, means sombody is distracted or ill
+#define SERIES_SIZE 10 //how many tries should be in one series
 
 // standard Arduino setup, which runs only once after MCU starts or resets
 void setup()
@@ -31,7 +32,14 @@ void setup()
   pinMode(BUTTON_PIN, INPUT_PULLUP);
 
   // say hallo
-  Serial.println("JRReflex ready, just press Boot button after blue LED is up, as quickly as you can");
+  Serial.println("==================================================================================");
+  Serial.println("JRReflex copyleft 2024 J.K.Wachowicz (github: jumper456)");
+  Serial.println("==================================================================================");
+  Serial.println("READY, just press Boot button after blue LED is up, as quickly as you can.");
+  Serial.printf("After %d tries statistics are presented.\n", SERIES_SIZE);
+  Serial.println("After holding the button for few seconds session is reset");
+  Serial.println("==================================================================================");
+  Serial.println();
 }
 
 // global varibles needed to hold values between consequtive loop() calls/runs
@@ -78,12 +86,25 @@ void loop()
       {
         Serial.printf("Reaction time in miliseconds %d | too long or too quick, NOT COUNTED \n", currentResult);
       };
-      
+
       if (currentResult < MIN_RESONABLE_TIME)
       {
         // assume user hold key, meanning wants to reset the count
-        Serial.printf("RESET of statistics\n");
+        Serial.printf("Key hold for few seconds: RESET of statistics\n");
         acc.reset();
+        delay(3000);
+      }
+
+      if (acc.getSize() == SERIES_SIZE)
+      {
+        Serial.printf("===========================================================================\n");
+        Serial.printf("Series of %d tests done!\n", SERIES_SIZE);
+        Serial.printf("Mean %4.0f Median %4.0f StdDeviation %4.0f Variance %4.0f\n",
+                      acc.getMean(), acc.getMediam(), acc.getStandardDeviation(), acc.getVariance());
+
+        Serial.printf("===========================================================================\n");
+        acc.reset();
+        delay(3000);
       }
 
       // start again
